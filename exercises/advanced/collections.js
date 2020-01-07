@@ -7,11 +7,28 @@
  *      - i.e. the second line in the new file should be the first line of `filePaths[1]`
  *    4. Writes the new file to the file located at `writePath`
  */
+const fs = require('fs');
+const Promise = require('bluebird');
+const {pluckFirstLineFromFileAsync} = require('../bare_minimum/promiseConstructor.js');
 
 
-var combineFirstLineOfManyFiles = function(filePaths, writePath) {
- // TODO
-};
+var combineFirstLineOfManyFiles = (filePaths, writePath) => new Promise((resolve, reject) => {
+
+  // TODO
+  const readLinePromises = filePaths.map(filePath => pluckFirstLineFromFileAsync(filePath));
+  Promise.all(readLinePromises)
+    .then(firstLines => {
+      const outputText = firstLines.join('\n');
+      fs.writeFile(writePath, outputText, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(outputText);
+        }
+      });
+    })
+    .catch(err => reject(err));
+});
 
 // Export these functions so we can unit test them
 module.exports = {

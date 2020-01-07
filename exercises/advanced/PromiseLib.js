@@ -3,7 +3,7 @@ var Promise = require('bluebird');
 
 /**
  * Return a function that wraps `nodeStyleFn`. When the returned function is invoked,
- * it will return a promise which will be resolved or rejected, depending on 
+ * it will return a promise which will be resolved or rejected, depending on
  * the execution of the now-wrapped `nodeStyleFn`
  *
  * In other words:
@@ -14,9 +14,15 @@ var Promise = require('bluebird');
  * expect a callback function as one of its arguments
  */
 
-var promisify = function(nodeStyleFn) {
- // TODO
-};
+var promisify = nodeStyleFn => (...args) => new Promise((resolve, reject) => {
+  nodeStyleFn(...args, (err, data) => {
+    if (err) {
+      reject(err);
+    } else {
+      resolve(data);
+    }
+  });
+});
 
 
 /**
@@ -30,10 +36,19 @@ var promisify = function(nodeStyleFn) {
  * is rejected with the rejection reason.
  */
 
-var all = function(arrayOfPromises) {
-  // TODO
-};
-
+var all = arrayOfPromises => new Promise((resolve, reject) => {
+  let resolutions = [];
+  arrayOfPromises.forEach((currentPromise, i) => {
+    currentPromise
+      .then(currentResolution => {
+        resolutions[i] = currentResolution;
+        if (resolutions.length === arrayOfPromises.length) {
+          resolve(resolutions);
+        }
+      })
+      .catch(err => reject(err));
+  });
+});
 
 /**
  * Given an array of promises, return a promise that is resolved or rejected,
@@ -41,9 +56,12 @@ var all = function(arrayOfPromises) {
  * the first to be resolved/rejected promise in the passed-in array
  */
 
-var race = function(arrayOfPromises) {
-  // TODO
-};
+var race = arrayOfPromises => new Promise((resolve, reject) => {
+  arrayOfPromises.forEach(currentPromise =>
+    currentPromise
+      .then(currentResolution => resolve(currentResolution))
+      .catch(err => reject(err)));
+});
 
 // Export these functions so we can unit test them
 module.exports = {

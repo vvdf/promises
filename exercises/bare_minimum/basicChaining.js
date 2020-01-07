@@ -18,8 +18,6 @@ var { getGitHubProfileAsync } = require('./promisification');
 // var userPath = 'https://api.github.com/users/d-rowe'
 
 var fetchProfileAndWriteToFile = (readFilePath, writeFilePath) => new Promise((resolve, reject) => {
-  // Read username from readFilePath
-  // pluckFirstLineFromFile
   pluckFirstLineFromFileAsync(readFilePath)
     .then(userName => getGitHubProfileAsync(userName))
     .then(data => {
