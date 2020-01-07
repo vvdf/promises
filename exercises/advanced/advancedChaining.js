@@ -18,8 +18,10 @@ var Promise = require('bluebird');
 var lib = require('../../lib/advancedChainingLib');
 var Clarifai = require('clarifai');
 var request = require('request');
+var fs = require('fs');
+var { CLARIFAI_API_KEY, GITHUB_OATH } = require('../../config.js');
 
-const app = new Clarifai.App({ apiKey: 'fe05697f794f453280c897a019735c4b' });
+const app = new Clarifai.App({ apiKey: CLARIFAI_API_KEY });
 
 // We're using Clarifai's API to recognize concepts in an image into a list of concepts
 // Visit the following url to sign up for a free account
@@ -32,18 +34,28 @@ var searchCommonConceptsFromGitHubProfiles = githubHandles => new Promise((resol
   // get the public profile with each handle
   var requestPromise = Promise.promisify(request);
   // console.log(githubHandles);
-  var requestPromiseArr = githubHandles.map(handle => requestPromise(`https://api.github.com/users/${handle}`));
+  var requestPromiseArr = githubHandles.map(handle => requestPromise({
+    url: `https://api.github.com/users/${handle}`,
+    headers: {
+      'User-Agent': 'node.js',
+      'Authorization': `token ${GITHUB_OATH}`
+    },
+  }));
   Promise.all(requestPromiseArr)
     .then(gitHubResponses => {
       // extract avatar url for each profile
-      return Promise.all(gitHubResponses.map(response => {
-        console.log(response.body);
-        app.models.predict(Clarifai.GENERAL_MODEL, response.avatar_url);
+      return gitHubResponses.map(response => {
+        return app.models.predict(Clarifai.GENERAL_MODEL, JSON.parse(response.body).avatar_url);
       }
-      ));
+      );
     })
-    .then(clarafaiResponses => {
-      // console.log(clarafaiResponses);
+    .then(clarifaiPromises => (
+      Promise.all(clarifaiPromises)
+    ))
+    .then(clarifaiResponses => {
+      const conceptsArr = clarifaiResponses.map(response => response.outputs[0].data.concepts);
+      const conceptNamesArr = conceptsArr.map(userConcepts => userConcepts.map(userConcept => userConcept.name));
+      console.log(conceptNamesArr);
     });
   // get the 'concepts' for each avatar url (requires API key)
 
