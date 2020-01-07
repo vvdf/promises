@@ -1,7 +1,7 @@
 /**
  * Create the promise returning `Async` suffixed versions of the functions below,
  * Promisify them if you can, otherwise roll your own promise returning function
- */ 
+ */
 
 var fs = require('fs');
 var request = require('request');
@@ -27,7 +27,15 @@ var getGitHubProfile = function(user, callback) {
   });
 };
 
-var getGitHubProfileAsync; // TODO
+var getGitHubProfileAsync = user => new Promise((resolve, reject) => {
+  getGitHubProfile(user, (err, data) => {
+    if (err) {
+      reject(err);
+    } else {
+      resolve(data);
+    }
+  });
+});
 
 
 // (2) Asyncronous token generation
@@ -38,25 +46,41 @@ var generateRandomToken = function(callback) {
   });
 };
 
-var generateRandomTokenAsync; // TODO
+var generateRandomTokenAsync = () => new Promise((resolve, reject) => {
+  generateRandomToken((err, buffer) => {
+    if (err) {
+      reject(err);
+    } else {
+      resolve(buffer);
+    }
+  });
+});
 
 
 // (3) Asyncronous file manipulation
 var readFileAndMakeItFunny = function(filePath, callback) {
   fs.readFile(filePath, 'utf8', function(err, file) {
     if (err) { return callback(err); }
-   
+
     var funnyFile = file.split('\n')
       .map(function(line) {
         return line + ' lol';
       })
       .join('\n');
 
-    callback(funnyFile);
+    callback(null, funnyFile);
   });
 };
 
-var readFileAndMakeItFunnyAsync; // TODO
+var readFileAndMakeItFunnyAsync = (filePath) => new Promise((resolve, reject) => {
+  readFileAndMakeItFunny(filePath, (err, file) => {
+    if (err) {
+      reject(err);
+    } else {
+      resolve(file);
+    }
+  });
+});
 
 // Export these functions so we can test them and reuse them in later exercises
 module.exports = {
