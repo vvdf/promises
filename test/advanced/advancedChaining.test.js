@@ -12,24 +12,24 @@ describe('Advanced chaining', function() {
   describe('searchCommonConceptsFromGitHubProfiles', function() {
     var searchCommonConceptsFromGitHubProfiles = chaining.searchCommonConceptsFromGitHubProfiles;
 
-    // it('should return a promise', function() {
-    //   // Must return a Bluebird promise. ES6 promise won't work here
-    //   expect(searchCommonConceptsFromGitHubProfiles(['danthareja'])).to.be.an.instanceOf(Promise);
-    // });
+    it('should return a promise', function() {
+      // Must return a Bluebird promise. ES6 promise won't work here
+      expect(searchCommonConceptsFromGitHubProfiles(['danthareja'])).to.be.an.instanceOf(Promise);
+    });
 
-    // xit('should resolve to an array of tags', function(done) {
-    //   this.timeout(5000);
-    //   searchCommonConceptsFromGitHubProfiles(['danthareja'])
-    //     .then(function(tags) {
-    //       expect(tags).to.be.an.instanceOf(Array);
-    //       done();
-    //     })
-    //     .catch(done);
-    // });
+    it('should resolve to an array of tags', function(done) {
+      this.timeout(5000);
+      searchCommonConceptsFromGitHubProfiles(['danthareja'])
+        .then(function(tags) {
+          expect(tags).to.be.an.instanceOf(Array);
+          done();
+        })
+        .catch(done);
+    });
 
     it('should not have duplicate adjectives in the array of tags', function(done) {
       this.timeout(5000);
-      searchCommonConceptsFromGitHubProfiles(['d-rowe', 'beth']) // Add beth
+      searchCommonConceptsFromGitHubProfiles(['danthareja', 'beth']) // Add beth
         .then(function(tags) {
           var uniques = Object.keys(
             tags.reduce(function(hash, tag) {
@@ -44,16 +44,14 @@ describe('Advanced chaining', function() {
         .catch(done);
     });
 
-    xit('should contain the correct tags', function(done) {
+    it('should contain the correct tags', function(done) {
       this.timeout(5000);
       searchCommonConceptsFromGitHubProfiles(['danthareja', 'sunny-g'])
         .then(function(tags) {
-          expect(tags).to.contain('men');
+          expect(tags).to.contain('man');
           done();
         })
         .catch(done);
     });
-
   });
-
 });

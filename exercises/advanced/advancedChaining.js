@@ -55,14 +55,10 @@ var searchCommonConceptsFromGitHubProfiles = githubHandles => new Promise((resol
     .then(clarifaiResponses => {
       const conceptsArr = clarifaiResponses.map(response => response.outputs[0].data.concepts);
       const conceptNamesArr = conceptsArr.map(userConcepts => userConcepts.map(userConcept => userConcept.name));
-      console.log(conceptNamesArr);
-    });
-  // get the 'concepts' for each avatar url (requires API key)
-
-  // find intersection of concepts
-  // ie, resolve our promise into an array of intersecting/overlapping 'concepts'
-  // between each pulled profile's data
-  // iterating through each set of concepts
+      const intersectingTags = lib.getIntersection(conceptNamesArr);
+      resolve(intersectingTags);
+    })
+    .catch(err => reject(err));
 });
 
 // Export these functions so we can unit test them
